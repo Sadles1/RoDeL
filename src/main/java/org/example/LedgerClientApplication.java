@@ -14,8 +14,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
 public class LedgerClientApplication {
-
-    private static String privateKeyBase;
     private static String baseUrl;
 
     public static void main(String[] args) throws Exception {
@@ -25,17 +23,17 @@ public class LedgerClientApplication {
 
         String host = args[0];
         int port = Integer.parseInt(args[1]);
-        privateKeyBase = args[2];
+
         baseUrl = "https://" + host + ":" + port + "/api";
 
         //This remove TLS certificate check, only for development.
         //todo: Fix before production
         disableCertificateCheck();
 
-        createAccount();
+        createAccount("test_user_1");
     }
 
-    private static void createAccount() throws Exception {
+    private static void createAccount(String newUserId) throws Exception {
         KeyPair keyPair = KeyPairUtil.generateECDSAKeyPair();
         String publicKey = KeyPairUtil.encodePublicKey(keyPair.getPublic());
         String privateKey = KeyPairUtil.encodePrivateKey(keyPair.getPrivate());
@@ -47,7 +45,7 @@ public class LedgerClientApplication {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("UserId", "test_user_2");
+        headers.add("UserId", newUserId);
         headers.add("Body", publicKey);
         headers.add("Signature", signedBase);
 
@@ -57,14 +55,14 @@ public class LedgerClientApplication {
         System.out.println(response.getBody());
     }
 
-    private static void getBalance() throws Exception {
+    private static void getBalance(String userId, String privateKeyBase) throws Exception {
         String body = "verify";
 
         String signedBase = signBody(body, privateKeyBase);
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("UserId", "test_user_1");
+        headers.add("UserId", userId);
         headers.add("Body", body);
         headers.add("Signature", signedBase);
 
@@ -90,22 +88,25 @@ public class LedgerClientApplication {
     }
 
     private static void disableCertificateCheck() {
-        TrustManager[] trustAllCerts = new TrustManager[] {
+        TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return null;
                     }
+
                     @Override
                     public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-                            throws CertificateException {}
+                            throws CertificateException {
+                    }
 
                     @Override
                     public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-                            throws CertificateException {}
+                            throws CertificateException {
+                    }
                 }
         };
 
-        SSLContext sc=null;
+        SSLContext sc = null;
         try {
             sc = SSLContext.getInstance("SSL");
         } catch (NoSuchAlgorithmException e) {
