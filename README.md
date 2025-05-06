@@ -10,16 +10,16 @@ Running the Client
 
 Once all 4 replicas are up and have reached consensus, you can run LedgerClientApplication.java with two command-line arguments:
 
-    A string – the API URL
+    String – the API URL
 
-    An integer – the API port
+    int – the API port
 
 Currently, there is no dedicated UI for the client. To make requests, you need to manually call the following methods in main():
 Available Methods:
 
     createAccount()
 
-        Parameters: userId (any custom identifier)
+        Parameters: String userId (any custom identifier)
 
         Generates and returns a private key (save this key for future use).
 
@@ -27,6 +27,6 @@ Available Methods:
 
         Parameters:
 
-            An existing userId
+            String userId (should exist)
 
-            The corresponding private key (generated during createAccount())
+            String private key (generated during createAccount())
