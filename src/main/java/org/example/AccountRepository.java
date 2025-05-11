@@ -1,5 +1,8 @@
 package org.example;
 
 import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 
-public interface AccountRepository extends CrudRepository<Account, String> { }
+public interface AccountRepository extends CrudRepository<Account, String> {
+    public List<Account> findAccountsByUserId(String userId);
+}

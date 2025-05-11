@@ -1,7 +1,21 @@
 package org.example;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
+
+import java.util.UUID;
+
+
+@RedisHash("Transaction")
 public class Transaction {
+    @Id
+    private UUID id;
+
+    @Indexed
     private String source;
+
+    @Indexed
     private String destination;
     private double amount;
 
@@ -28,4 +42,13 @@ public class Transaction {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
 }

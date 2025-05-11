@@ -1,0 +1,62 @@
+version: '3.8'
+
+networks:
+  bft-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
+
+services:
+  replica0:
+    image: rodel-app
+    networks:
+      bft-net:
+        ipv4_address: 172.20.0.2
+    ports:
+      - "8443:8443"
+      - "10000:10000"
+      - "10001:10001"
+    environment:
+      - APP_ID=0
+      - APP_API_PORT=8443
+
+  replica1:
+    image: rodel-app
+    networks:
+      bft-net:
+        ipv4_address: 172.20.0.3
+    ports:
+      - "8444:8444"
+      - "10010:10010"
+      - "10011:10011"
+    environment:
+      - APP_ID=1
+      - APP_API_PORT=8444
+      
+  replica2:
+    image: rodel-app
+    networks:
+       bft-net:
+         ipv4_address: 172.20.0.4
+    ports:
+      - "8445:8445"
+      - "10020:10020"
+      - "10021:10021"
+    environment:
+      - APP_ID=2
+      - APP_API_PORT=8445
+      
+  replica3:
+    image: rodel-app
+    networks:
+       bft-net:
+         ipv4_address: 172.20.0.5
+    ports:
+      - "8446:8446"
+      - "10030:10030"
+      - "10031:10031"
+    environment:
+      - APP_ID=3
+      - APP_API_PORT=8446

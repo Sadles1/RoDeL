@@ -1,6 +1,8 @@
 package org.example;
 
+import bftsmart.tom.ServiceReplica;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +16,10 @@ import static org.example.StringSerializer.serializeStrings;
 @RestController
 @RequestMapping("/api")
 public class LedgerController {
-    private final AccountRepository accountRepository;
-    private final ServiceProxy bftProxy = new ServiceProxy(0);
-
-    public LedgerController(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    private final ServiceProxy bftProxy;
+    public LedgerController(ApplicationArguments args) {
+        int serverId = Integer.parseInt(args.getNonOptionArgs().get(0));
+        this.bftProxy = new ServiceProxy(serverId);
     }
 
     @EventListener
@@ -29,15 +30,15 @@ public class LedgerController {
     //todo: This is the main API method for bft, all other should be deleted after
     @RequestMapping("/**")
     public ResponseEntity<?> handleRequests(HttpServletRequest request,
-                                            @RequestHeader("UserId") String accountId,
+                                            @RequestHeader("Id") String id,
                                             @RequestHeader("Body") String body,
                                             @RequestHeader("Signature") String signature) throws Exception {
         String path = request.getRequestURI().replaceFirst("^/api/", "");
 
-        byte[] serialized = serializeStrings(path, accountId, body, signature);
+        byte[] serialized = serializeStrings(path, id, body, signature, String.valueOf(System.currentTimeMillis()));
         byte[] reply = bftProxy.invokeOrdered(serialized);
 
-        return ResponseEntity.ok().body(deserializeStrings(reply));
+        return ResponseEntity.ok().body(deserializeStrings(reply)[0]);
     }
 }
 
