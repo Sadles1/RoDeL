@@ -1,100 +1,79 @@
-Starting a REST API Server with BFT Replica
+# REST API Server with BFT Replica
 
-To launch a BFT replicas with a REST API servers:
-1. Build maven app
-1. Build docker image
-2. Run docker compose (you can change ip's and port's here)
+## Launching BFT Replicas with REST API Servers
 
-Running the API Client:
+To launch BFT replicas with REST API servers:
+1. Build the Maven application
+2. Build Docker image
+3. Run Docker compose (you can change IPs and ports in the configuration)
 
-Once all 4 replicas are up, you can run LedgerClientApplication.java with two command-line arguments:
+## Testing Options
 
-    String – the API URL
+You have two ways to test the system:
 
-    int – the API port
+### 1. Manual Testing with API Client
 
-Currently, there is no dedicated UI for the client. 
-To make requests, you can manually call the following methods in main():
+Run the client using `LedgerClientApplication.java` with two command-line arguments:
+- `String` - the API URL
+- `int` - the API port
 
-createUser()
+**Available API Methods:**
 
-        Parameters: String userId (any custom identifier)
+#### `createUser()`
+- **Parameters**: 
+  - `String userId` (any custom identifier)
+- **Description**:
+  - Generates a private key (save this key for future use)
+- **Returns**: `User user`
 
-        Generates a private key (save this key for future use).
+#### `createAccount()`
+- **Parameters**:
+  - `String userId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+- **Returns**: `Account account`
 
-        Returns: User user
-createAccount()
+#### `loadMoney()`
+- **Parameters**:
+  - `String accountId` (should exist)
+  - `double amount`
+- **Returns**: `double newBalance`
 
-        Parameters:
+#### `getBalance()`
+- **Parameters**:
+  - `String accountId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+- **Returns**: `double balance`
 
-            String userId (should exist)
+#### `getGlobalLedgerValue()`
+- **Parameters**:
+  - `String accountId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+- **Returns**: `double totalBalance`
 
-            String private key (generated during createUser())
+#### `sendTransaction()`
+- **Parameters**:
+  - `String sourceAccountId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+  - `String destinationAccountId` (should exist)
+  - `double amount`
+- **Returns**: `Transaction transaction`
 
-        Returns: Account account
-        
-loadMoney()
+#### `getExtract()` (Account version)
+- **Parameters**:
+  - `String accountId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+- **Returns**: `List<Transaction> transactions`
 
-        Parameters:
+#### `getExtract()` (User version)
+- **Parameters**:
+  - `String userId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+- **Returns**: `Ledger ledger`
 
-            String accountId (should exist)
+### 2. Automated Performance Testing with Gatling
 
-            double amount
+For load testing and performance measurements, use the Gatling test suite:
 
-        Returns: double newBalance
-        
-getBalance()
-
-        Parameters:
-
-            String accountId (should exist)
-
-            String private key (generated during createUser())
-
-        Returns: double balance
-
-getGlobalLedgerValue()
-
-        Parameters:
-
-            String accountId (should exist)
-
-            String private key (generated during createUser())
-
-        Returns: double totalBalance
-
-sendTransaction()
-
-        Parameters:
-
-            String sourceAccountId (should exist)
-
-            String private key (generated during createUser())
-
-            String destinationAccountId (should exist)
-
-            double amount
-
-        Returns: Transaction transaction
-
-getExtract()
-
-        Parameters:
-
-            String accountId (should exist)
-
-            String private key (generated during createUser())
-
-        Returns: List<Transaction> transactions
-
-
-getExtract()
-
-        Parameters:
-
-            String userId (should exist)
-
-            String private key (generated during createUser())
-
-        Returns: Ledger ledger
-
+```bash
+# You can specify custom connection parameters
+mvn gatling:test -Dhost=<API_HOST> -Dport=<API_PORT>

@@ -18,6 +18,8 @@ public class ApiBenchmarkSimulation extends Simulation {
     private final String host = System.getProperty("host", "127.0.0.1");
     private final int port = Integer.parseInt(System.getProperty("port", "8443"));
 
+    private final long testTime = 20;
+
     // Формируем базовый URL
     private final String baseUrl = "https://" + host + ":" + port;
 
@@ -402,14 +404,14 @@ public class ApiBenchmarkSimulation extends Simulation {
 
     {
         setUp(
-                createUser.injectOpen(rampUsers(5).during(5))
+                createUser.injectOpen(rampUsers(new Random().nextInt(3) + 2).during(10))
                         .andThen(
-                                loadMoney.injectOpen(rampUsers(400).during(20)),
-                                getBalance.injectOpen(nothingFor(5), rampUsers(400).during(20)),
-                                getGlobalLedgerValue.injectOpen(nothingFor(3), rampUsers(100).during(20)),
-                                sendTransaction.injectOpen(nothingFor(3), rampUsers(100).during(20)),
-                                getExtract.injectOpen(nothingFor(6), rampUsers(50).during(20)),
-                                getLedger.injectOpen(nothingFor(10), rampUsers(50).during(20))
+                                loadMoney.injectOpen(rampUsers(new Random().nextInt(400) + 100).during(testTime)),
+                                getBalance.injectOpen(nothingFor(5), rampUsers(new Random().nextInt(200) + 100).during(testTime)),
+                                getGlobalLedgerValue.injectOpen(nothingFor(3), rampUsers(new Random().nextInt(100) + 50).during(testTime)),
+                                sendTransaction.injectOpen(nothingFor(3), rampUsers(new Random().nextInt(30) + 20).during(testTime)),
+                                getExtract.injectOpen(nothingFor(6), rampUsers(new Random().nextInt(30) + 20).during(testTime)),
+                                getLedger.injectOpen(nothingFor(10), rampUsers(new Random().nextInt(30) + 20).during(testTime))
                         )
         ).protocols(httpProtocol);
     }

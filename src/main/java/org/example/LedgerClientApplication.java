@@ -1,10 +1,7 @@
 package org.example;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.*;
@@ -15,6 +12,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
 import static org.example.KeyPairUtil.signBody;
+import static org.example.KeyPairUtil.verifySignature;
 import static org.example.StringSerializer.deserializeStrings;
 
 public class LedgerClientApplication {
@@ -42,7 +40,7 @@ public class LedgerClientApplication {
         //todo: Fix before production
         disableCertificateCheck();
 
-        //createUser("test_user_1@gmail.com");
+        createUser("test_user_1@gmail.com");
 
         /*createAccount(userIdBase, privateKeyBase);
         createAccount(userIdBase, privateKeyBase);*/
@@ -135,7 +133,14 @@ public class LedgerClientApplication {
         headers.add("Signature", signedBase);
 
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
-        return restTemplate.exchange(baseUrl + Request, HttpMethod.GET, entity, String.class);
+        ResponseEntity response = restTemplate.exchange(baseUrl + Request, HttpMethod.GET, entity, String.class);
+        String signature = response.getHeaders().getFirst("Signature");
+
+        if(!verifySignature(serverPublicKey, signature, response.getBody().toString())){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid signature");
+        }
+
+        return response;
     }
 
 
