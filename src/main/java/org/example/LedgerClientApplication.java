@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
+import static org.example.KeyPairUtil.signBody;
 import static org.example.StringSerializer.deserializeStrings;
 
 public class LedgerClientApplication {
@@ -24,6 +25,8 @@ public class LedgerClientApplication {
     static String privateKeyBase = "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCCjytQhTm/Ik/4EfpqCyb7py7HLVahc/yOCiqKjYYBS7g==";
 
     static String destinationAccountIdBase = "74e11a21bf1d0837ceba53f9f7fa6db756325a4dd4ced7b03af7d30d51814e05";
+
+    static String serverPublicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEJP+PNMN30iH0wcEBSWPiBIupJEuC1lZLJV80WnpHan9UTVZEDRgYV/VaH4QUHnUA+H335IDiqa4LGCsx3v9hLg==";
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -39,9 +42,9 @@ public class LedgerClientApplication {
         //todo: Fix before production
         disableCertificateCheck();
 
-        createUser("test_user_1@gmail.com");
+        //createUser("test_user_1@gmail.com");
 
-       /* createAccount(userIdBase, privateKeyBase);
+        /*createAccount(userIdBase, privateKeyBase);
         createAccount(userIdBase, privateKeyBase);*/
 /*
         loadMoney(accountIdBase, privateKeyBase, 1000);
@@ -135,21 +138,6 @@ public class LedgerClientApplication {
         return restTemplate.exchange(baseUrl + Request, HttpMethod.GET, entity, String.class);
     }
 
-
-    private static String signBody(String body, String signPrivateKey) throws Exception {
-        byte[] keyBytes = Base64.getDecoder().decode(signPrivateKey);
-
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-
-        Signature signature = Signature.getInstance("SHA256withECDSA");
-        signature.initSign(privateKey);
-        signature.update(body.getBytes());
-        byte[] signedData = signature.sign();
-
-        return Base64.getEncoder().encodeToString(signedData);
-    }
 
     private static void disableCertificateCheck() {
         TrustManager[] trustAllCerts = new TrustManager[]{

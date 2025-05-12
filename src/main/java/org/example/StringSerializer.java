@@ -1,34 +1,26 @@
 package org.example;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 
 public class StringSerializer {
-    public static byte[] serializeStrings(String... strings) throws IOException {
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-             DataOutputStream dataStream = new DataOutputStream(byteStream)) {
+    private static final ObjectMapper mapper = new ObjectMapper();
 
-            dataStream.writeInt(strings.length);
-
-            for (String str : strings) {
-                dataStream.writeUTF(str);
-            }
-
-            return byteStream.toByteArray();
+    public static byte[] serializeStrings(String... strings) {
+        try {
+            return mapper.writeValueAsBytes(strings);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static String[] deserializeStrings(byte[] bytes) throws IOException {
-        try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-             DataInputStream dataStream = new DataInputStream(byteStream)) {
-
-            int count = dataStream.readInt();
-            String[] strings = new String[count];
-
-            for (int i = 0; i < count; i++) {
-                strings[i] = dataStream.readUTF();
-            }
-
-            return strings;
+    public static String[] deserializeStrings(byte[] bytes) {
+        try {
+            return mapper.readValue(bytes, String[].class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

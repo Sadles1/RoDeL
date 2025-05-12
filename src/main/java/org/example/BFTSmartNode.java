@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
+import static org.example.KeyPairUtil.verifySignature;
 import static org.example.StringSerializer.deserializeStrings;
 import static org.example.StringSerializer.serializeStrings;
 
@@ -280,7 +279,8 @@ public final class BFTSmartNode extends DefaultSingleRecoverable {
             System.out.println("Response: " + response);
             return serializeStrings(response);
         } catch (Exception e) {
-            return ("ERROR: " + e.getMessage()).getBytes(StandardCharsets.UTF_8);
+            System.out.println(e.getMessage());
+            return serializeStrings(e.getMessage());
         }
     }
 
@@ -341,20 +341,6 @@ public final class BFTSmartNode extends DefaultSingleRecoverable {
         leastSigBits |= 0x8000000000000000L;
 
         return new UUID(mostSigBits, leastSigBits);
-    }
-
-    boolean verifySignature(String publicKeyBase, String signature, String body) throws Exception {
-        byte[] decodedSig = Base64.getDecoder().decode(signature);
-        byte[] decodedPub = Base64.getDecoder().decode(publicKeyBase);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(decodedPub));
-
-        Signature ecdsaVerify = java.security.Signature.getInstance("SHA256withECDSA");
-        ecdsaVerify.initVerify(publicKey);
-        ecdsaVerify.update(body.getBytes());
-
-        return ecdsaVerify.verify(decodedSig);
     }
 
     @Override

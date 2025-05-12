@@ -8,7 +8,6 @@ public class User {
     @Id
     private String id;
 
-
     private String publicKey;
 
     public void setId(String id) {
