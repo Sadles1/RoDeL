@@ -50,6 +50,19 @@ Run the client using `LedgerClientApplication.java` with two command-line argume
   - `String privateKey` (generated during `createUser()`)
 - **Returns**: `double totalBalance`
 
+#### `getExtract()` 
+- **Parameters**:
+  - `String accountId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+- **Returns**: `List<Transaction> transactions`
+
+#### `getLedger()` 
+- **Parameters**:
+  - `String userId` (should exist)
+  - `String privateKey` (generated during `createUser()`)
+- **Returns**: `Ledger ledger`
+
+
 #### `sendTransaction()`
 - **Parameters**:
   - `String sourceAccountId` (should exist)
@@ -57,18 +70,6 @@ Run the client using `LedgerClientApplication.java` with two command-line argume
   - `String destinationAccountId` (should exist)
   - `double amount`
 - **Returns**: `Transaction transaction`
-
-#### `getExtract()` (Account version)
-- **Parameters**:
-  - `String accountId` (should exist)
-  - `String privateKey` (generated during `createUser()`)
-- **Returns**: `List<Transaction> transactions`
-
-#### `getExtract()` (User version)
-- **Parameters**:
-  - `String userId` (should exist)
-  - `String privateKey` (generated during `createUser()`)
-- **Returns**: `Ledger ledger`
 
 ### 2. Automated Performance Testing with Gatling
 
